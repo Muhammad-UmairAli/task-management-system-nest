@@ -18,6 +18,6 @@ import { AuthController } from './auth.controller';
   ],
   providers: [AuthService],
   exports: [AuthService], // Export AuthService if needed in other modules
-  controllers: [AuthController], 
+  controllers: [AuthController],
 })
 export class AuthModule {}

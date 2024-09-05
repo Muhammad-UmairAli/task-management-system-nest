@@ -9,6 +9,10 @@ export class UsersController {
 
   @Post('register')
   register(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto.username, createUserDto.password, createUserDto.role);
+    return this.usersService.createUser(
+      createUserDto.username,
+      createUserDto.password,
+      createUserDto.role,
+    );
   }
 }

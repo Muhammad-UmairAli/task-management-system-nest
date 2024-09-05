@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { TasksModule } from './tasks/tasks.module';
+import { ProjectsModule } from './projects/projects.module';
 import * as dotenv from 'dotenv';
 
 dotenv.config(); // Load environment variables from .env file
@@ -16,11 +18,13 @@ dotenv.config(); // Load environment variables from .env file
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       synchronize: process.env.DB_SYNCHRONIZE === 'true',
-      entities: ["dist/**/*.entity.js"],
+      entities: ['dist/**/*.entity.js'],
       // autoLoadEntities: true,
     }),
     UsersModule,
     AuthModule,
+    TasksModule,
+    ProjectsModule,
   ],
 })
 export class AppModule {}

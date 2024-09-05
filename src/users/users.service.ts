@@ -11,12 +11,20 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async createUser(username: string, password: string, role: string): Promise<User> {
+  async createUser(
+    username: string,
+    password: string,
+    role: string,
+  ): Promise<User> {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = this.usersRepository.create({ username, password: hashedPassword, role });
+    const user = this.usersRepository.create({
+      username,
+      password: hashedPassword,
+      role,
+    });
     return this.usersRepository.save(user);
   }
-  
+
   async findByUsername(username: string): Promise<User | undefined> {
     return this.usersRepository.findOne({ where: { username } });
   }
