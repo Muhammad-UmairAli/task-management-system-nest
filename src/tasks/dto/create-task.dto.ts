@@ -10,4 +10,7 @@ export class CreateTaskDto {
 
   @IsString()
   status: string;
+
+  @IsString()
+  project: string;
 }

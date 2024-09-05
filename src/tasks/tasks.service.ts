@@ -1,48 +1,66 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { Task } from './task.interface';
+import { Task } from './task.entity';
 
 @Injectable()
 export class TasksService {
-  private tasks: Task[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
+  ) {}
 
-  create(createTaskDto: CreateTaskDto): Task {
-    const newTask: Task = {
-      id: this.idCounter++, // Auto-increment ID
-      title: createTaskDto.title,
-      description: createTaskDto.description,
-      status: createTaskDto.status,
-    };
-    this.tasks.push(newTask);
-    return newTask;
+  // Create a new task and save it to the database
+  async create(createTaskDto: CreateTaskDto): Promise<Task> {
+    const { title, description, status, project } = createTaskDto;
+
+    const newTask = this.taskRepository.create({
+      title,
+      description,
+      status,
+      // project, // Optional, depending on your use case
+    });
+
+    return await this.taskRepository.save(newTask);
   }
 
-  findAll(): Task[] {
-    return this.tasks;
+  // Find all tasks in the database
+  async findAll(): Promise<Task[]> {
+    return await this.taskRepository.find();
   }
 
-  findOne(id: number): Task {
-    const task = this.tasks.find((task) => task.id === id);
+  // Find a single task by ID
+  async findOne(id: number): Promise<Task> {
+    const task = await this.taskRepository.findOne({ where: { id } });
+
     if (!task) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
     return task;
   }
 
-  update(id: number, updateTaskDto: UpdateTaskDto): Task {
-    const task = this.findOne(id);
+  // Update an existing task by ID
+  async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
+    const task = await this.findOne(id);  // First, fetch the task
+
+    // Update the task fields if provided
     task.title = updateTaskDto.title ?? task.title;
     task.description = updateTaskDto.description ?? task.description;
-    return task;
+    task.status = updateTaskDto.status ?? task.status;
+    // task.project = updateTaskDto.project ?? task.project;
+
+    // Save the updated task to the database
+    return await this.taskRepository.save(task);
   }
 
-  delete(id: number): void {
-    const taskIndex = this.tasks.findIndex((task) => task.id === id);
-    if (taskIndex === -1) {
+  // Delete a task by ID
+  async delete(id: number): Promise<void> {
+    const result = await this.taskRepository.delete(id);
+
+    if (result.affected === 0) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
-    this.tasks.splice(taskIndex, 1);
   }
 }
